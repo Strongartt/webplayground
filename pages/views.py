@@ -1,11 +1,40 @@
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.views.generic.list import ListView
+from django.urls import reverse, reverse_lazy
+from django.shortcuts import redirect
 from .models import Page
 
-# Create your views here.
-def pages(request):
-    pages = get_list_or_404(Page)
-    return render(request, 'pages/pages.html', {'pages':pages})
+class StaffRequiredMixin(object):
+    """
+    Este mixin requerirá que el usuario sea miembro del staff
+    """
+    @method_decorator(staff_member_required)
+    def dispatch(self, request, *args, **kwargs):
+        return super(StaffRequiredMixin, self).dispatch(request, *args, **kwargs)
 
-def page(request, page_id, page_slug):
-    page = get_object_or_404(Page, id=page_id)
-    return render(request, 'pages/page.html', {'page':page})
+# Create your views here.
+class PagesListView(ListView):
+    model = Page
+
+class PageDetailView(DetailView):
+    model = Page
+    
+class PageCreate(StaffRequiredMixin, CreateView):
+    model = Page
+    fields = ['title','content','order']
+    success_url = reverse_lazy('pages:pages')
+    
+class PageUpdate(StaffRequiredMixin, UpdateView):
+    model = Page
+    fields = ['title','content','order']
+    template_name_suffix = '_update_form'
+
+    def get_success_url(self):
+        return reverse_lazy ('pages:update', args=[self.object.id]) + '?ok'
+
+class PageDelete(StaffRequiredMixin, DeleteView):
+    model = Page
+    success_url = reverse_lazy("pages:pages")
