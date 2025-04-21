@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-*sw-**^(!9n5_bdar=+)-s(ocs@%$rt)#q#s0=_*4r2o)ok4%l
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://webplayground-hmjh.onrender.com']
 
 
 # Application definition
